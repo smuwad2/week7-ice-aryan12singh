@@ -3,11 +3,11 @@
         // Add code in appropriate places
         data() {
             return {
-                items: ['keyboard', 'mouse', 'iPhone', 'macbook', 'adapter']
+                items: ['keyboard', 'mouse', 'iPhone', 'macbook', 'adapter'],
                 newItem: ''  // For storing the text input value
             }
             
-        }
+        },
           methods: {
             deleteItem(index) {
             // Remove item at specific index

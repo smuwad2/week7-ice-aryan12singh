@@ -4,50 +4,60 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      posts: [],  // Array to store all blog posts
-      editingPostId: null,  // Track which post is being edited (null = none)
-      editForm: {  // Store the values being edited
+      posts: [],
+      editingPostId: null,
+      editForm: {
         entry: '',
         mood: ''
       },
-      moods: ['Happy', 'Sad', 'Angry']  // Mood options
+      moods: ['Happy', 'Sad', 'Angry']
+    }
+  },
+  
+  computed: {
+    // Automatically detects if running on localhost or Codespaces
+    baseUrl() {
+      if (window.location.hostname == 'localhost')
+        return 'http://localhost:3000'
+      else {
+        const codespace_host = window.location.hostname.replace('5173', '3000')
+        return `https://${codespace_host}`;
+      }
     }
   },
   
   created() {
-    // Fetch posts when component is created
     this.fetchPosts();
   },
   
   methods: {
-    // Fetch all posts from backend
     fetchPosts() {
-      axios.get('http://localhost:3000/getPosts')
+      // Use /posts endpoint (not /getPosts)
+      axios.get(`${this.baseUrl}/posts`)
         .then(response => {
           this.posts = response.data;
+          console.log('Posts loaded:', this.posts);
         })
         .catch(error => {
           console.error('Error fetching posts:', error);
         });
     },
     
-    // Show edit form for a specific post
     startEdit(post) {
+      console.log('Edit clicked for post:', post);
       this.editingPostId = post.id;
       this.editForm.entry = post.entry;
       this.editForm.mood = post.mood;
     },
     
-    // Cancel editing and hide the form
     cancelEdit() {
       this.editingPostId = null;
       this.editForm.entry = '';
       this.editForm.mood = '';
     },
     
-    // Update the post using PUT request
     updatePost(postId) {
-      axios.put('http://localhost:3000/updatePost', {
+      axios.put(`${this.baseUrl}/updatePost`, {
         id: postId,
         entry: this.editForm.entry,
         mood: this.editForm.mood
@@ -55,21 +65,16 @@ export default {
       .then(response => {
         console.log('Post updated:', response.data);
         
-        // Update the post in the local array
-        const post = this.posts.find(p => p.id === postId);
+        const post = this.posts.find(p => p.id == postId);
         if (post) {
           post.entry = this.editForm.entry;
           post.mood = this.editForm.mood;
         }
         
-        // Hide the edit form
         this.cancelEdit();
-        
-        alert('Post updated successfully!');
       })
       .catch(error => {
         console.error('Error updating post:', error);
-        alert('Error updating post: ' + error.message);
       });
     }
   }
@@ -80,7 +85,6 @@ export default {
   <div>
     <h2>Blog Posts</h2>
     
-    <!-- Table of blog posts -->
     <table border="1" style="width: 100%; border-collapse: collapse;">
       <thead>
         <tr>
@@ -102,16 +106,15 @@ export default {
       </tbody>
     </table>
     
-    <!-- Edit form (only shows when editing) -->
-    <div v-if="editingPostId !== null" style="margin-top: 20px; padding: 20px; border: 2px solid #ccc;">
+    <div v-if="editingPostId !== null" id="editPost" style="margin-top: 20px; padding: 20px; border: 2px solid #ccc;">
       <h3>Edit Post</h3>
       
       <label>Entry</label><br>
-      <textarea v-model="editForm.entry" rows="5" cols="80"></textarea>
+      <textarea id="entry" v-model="editForm.entry" rows="5" cols="80"></textarea>
       <br><br>
       
       <label>Mood</label><br>
-      <select v-model="editForm.mood">
+      <select id="mood" v-model="editForm.mood">
         <option v-for="m in moods" :key="m">{{ m }}</option>
       </select>
       <br><br>
