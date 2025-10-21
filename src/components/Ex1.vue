@@ -1,7 +1,25 @@
 <script>
-    export default { 
-        // Add Code Here to complete the task
-        // Note: DO NOT USE "eval()". In security, "eval" is considered "evil"!!!
+    export default {
+    data() {
+        return {
+        x: 10,
+        y: 2,
+        operators: ['+', '-', '*', '/', '%'],
+        selectedOp: '+'
+        }
+    },
+    computed: {
+        result() {
+        switch(this.selectedOp) {
+            case '+': return this.x + this.y;
+            case '-': return this.x - this.y;
+            case '*': return this.x * this.y;
+            case '/': return this.x / this.y;
+            case '%': return this.x % this.y;
+            default: return 0;
+        }
+        }
+    }
     }
 </script>
 
